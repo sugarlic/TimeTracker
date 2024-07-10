@@ -21,9 +21,9 @@ import (
 )
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	users    postgre.UserService
+	errorLog  *log.Logger
+	infoLog   *log.Logger
+	userTasks postgre.UserTasksService
 }
 
 func main() {
@@ -61,9 +61,9 @@ func main() {
 	fmt.Println("Database connected and migrations applied successfully!")
 
 	app := &application{
-		infoLog:  infoLog,
-		errorLog: errorLog,
-		users:    &postgre.UserModel{DB: db},
+		infoLog:   infoLog,
+		errorLog:  errorLog,
+		userTasks: &postgre.UserTasksModel{DB: db},
 	}
 
 	srv := &http.Server{

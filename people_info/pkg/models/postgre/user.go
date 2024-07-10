@@ -45,7 +45,7 @@ func (m *UserModel) Delete(id int) error {
 
 func (m *UserModel) Get(passportSerie, passportNumber int) (*models.User, error) {
 	var user *models.User
-	result := m.DB.Take(&user, "passport_serie = ? AND passport_number = ?", passportSerie, passportNumber)
+	result := m.DB.Take(&user, "passport_serie = ? AND passport_number = ? ", passportSerie, passportNumber)
 	if result.Error != nil {
 		return nil, result.Error
 	}

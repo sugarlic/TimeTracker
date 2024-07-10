@@ -49,7 +49,7 @@ func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
 
 	s, err := app.users.Get(passportSerie, passportNumber)
 	if err != nil {
-		app.serverError(w, err)
+		app.notFound(w)
 		return
 	}
 

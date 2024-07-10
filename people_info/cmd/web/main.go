@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"fmt"
 	"log"
@@ -12,8 +11,6 @@ import (
 	gormPostgres "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	migrate "github.com/golang-migrate/migrate/v4"
-	migratePostgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq" // PostgreSQL driver
 
@@ -52,11 +49,6 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Применение миграций
-	if err := applyMigrations(dsn); err != nil {
-		log.Fatalf("Failed to apply migrations: %v", err)
-	}
-
 	// Теперь вы можете использовать `db` для взаимодействия с базой данных
 	fmt.Println("Database connected and migrations applied successfully!")
 
@@ -74,31 +66,4 @@ func main() {
 
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
-}
-
-func applyMigrations(dsn string) error {
-	// Открываем стандартное SQL соединение для миграций
-	db, err := sql.Open("postgres", dsn)
-	if err != nil {
-		return fmt.Errorf("failed to open database: %w", err)
-	}
-	defer db.Close()
-
-	driver, err := migratePostgres.WithInstance(db, &migratePostgres.Config{})
-	if err != nil {
-		return fmt.Errorf("failed to create migration driver: %w", err)
-	}
-
-	m, err := migrate.NewWithDatabaseInstance(
-		"file://migrations",
-		"postgres", driver)
-	if err != nil {
-		return fmt.Errorf("failed to create migrate instance: %w", err)
-	}
-
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("failed to apply migrations: %w", err)
-	}
-
-	return nil
 }

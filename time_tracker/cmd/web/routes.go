@@ -9,7 +9,7 @@ func (app *application) routes() *http.ServeMux {
 	// mux.HandleFunc("/user/update", nil)
 	// mux.HandleFunc("/user/create", nil)
 	// mux.HandleFunc("/user/cd/start", nil)
-	// mux.HandleFunc("/user/cd/end", nil)
-	mux.HandleFunc("/user/delete", app.deleteUser)
+	mux.HandleFunc("/create", app.createUser)
+	mux.HandleFunc("/delete", app.deleteUser)
 	return mux
 }

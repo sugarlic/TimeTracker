@@ -14,6 +14,10 @@ type User struct {
 	Updated        time.Time
 }
 
+func (User) TableName() string {
+	return "users"
+}
+
 type People struct {
 	Name       string `json:"name"`
 	Surname    string `json:"surname"`
