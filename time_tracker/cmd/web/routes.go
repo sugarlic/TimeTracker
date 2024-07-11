@@ -4,12 +4,9 @@ import "net/http"
 
 func (app *application) routes() *http.ServeMux {
 	mux := http.NewServeMux()
-	// mux.HandleFunc("/", nil)
-	// mux.HandleFunc("/user", nil) // Same as /
-	// mux.HandleFunc("/user/update", nil)
-	// mux.HandleFunc("/user/create", nil)
-	// mux.HandleFunc("/user/cd/start", nil)
-	mux.HandleFunc("/create", app.createUser)
-	mux.HandleFunc("/delete", app.deleteUser)
+	mux.HandleFunc("/users/tasks/start", app.startTask)
+	mux.HandleFunc("/users/tasks/end", app.endTask)
+	mux.HandleFunc("/users", app.createUser)
+	mux.HandleFunc("/users/", app.deleteUser)
 	return mux
 }

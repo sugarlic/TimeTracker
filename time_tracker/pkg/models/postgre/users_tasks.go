@@ -1,6 +1,8 @@
 package postgre
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 	"test.com/pkg/models"
 )
@@ -8,6 +10,8 @@ import (
 type UserTasksService interface {
 	Delete(id int) error
 	Create(people *models.People) error
+	StartTask(user_id, task_id int) error
+	EndTask(user_id int) error
 }
 
 type UserTasksModel struct {
@@ -31,17 +35,46 @@ func (m *UserTasksModel) Create(people *models.People) error {
 	return nil
 }
 
-func (m *UserTasksModel) Delete(id int) error {
-	// var user models.User
-	// result := m.DB.First(&user, "id = ?", id)
-	// if result.Error != nil {
-	// 	return result.Error
-	// }
+func (m *UserTasksModel) StartTask(user_id, task_id int) error {
+	var user models.UserTask
+	result := m.DB.Find(&user, "id = ?", user_id)
+	if result.Error != nil {
+		return result.Error
+	}
 
-	// result = m.DB.Delete(&user)
-	// if result.Error != nil {
-	// 	return result.Error
-	// }
+	user.TaskId = task_id
+	user.StartTime = time.Now()
+
+	result.Save(&user)
+	return nil
+}
+
+func (m *UserTasksModel) EndTask(user_id int) error {
+	var user models.UserTask
+	result := m.DB.Find(&user, "id = ?", user_id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	user.TaskId = 1
+	user.EndTime = time.Now()
+	user.TotalMinutes = int(time.Since(user.StartTime).Minutes())
+
+	result.Save(&user)
+	return nil
+}
+
+func (m *UserTasksModel) Delete(id int) error {
+	var user models.UserTask
+	result := m.DB.First(&user, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	result = m.DB.Delete(&user)
+	if result.Error != nil {
+		return result.Error
+	}
 
 	return nil
 }

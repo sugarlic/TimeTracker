@@ -63,6 +63,58 @@ func (app *application) createUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Succes"))
 }
 
+func (app *application) startTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	user_id, err := strconv.Atoi(r.URL.Query().Get("user_id"))
+	if err != nil || user_id < 1 {
+		app.notFound(w)
+		return
+	}
+
+	task_id, err := strconv.Atoi(r.URL.Query().Get("task_id"))
+	if err != nil || task_id < 1 {
+		app.notFound(w)
+		return
+	}
+
+	err = app.userTasks.StartTask(user_id, task_id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.infoLog.Println("User id = ", user_id, " started task_id = ", task_id)
+	w.Write([]byte("Started"))
+}
+
+func (app *application) endTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	user_id, err := strconv.Atoi(r.URL.Query().Get("user_id"))
+	if err != nil || user_id < 1 {
+		app.notFound(w)
+		return
+	}
+
+	err = app.userTasks.EndTask(user_id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.infoLog.Println("User id = ", user_id, " complete his task")
+	w.Write([]byte("Started"))
+}
+
 func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		w.Header().Set("Allow", http.MethodDelete)
