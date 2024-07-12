@@ -11,6 +11,23 @@ import (
 	"test.com/pkg/models"
 )
 
+func (app *application) getList(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	users, err := app.userTasks.GetList()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	app.render(w, users)
+}
+
 func (app *application) createUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
@@ -89,6 +106,7 @@ func (app *application) startTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.infoLog.Println("User id = ", user_id, " started task_id = ", task_id)
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Started"))
 }
 
@@ -112,7 +130,8 @@ func (app *application) endTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.infoLog.Println("User id = ", user_id, " complete his task")
-	w.Write([]byte("Started"))
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Completed"))
 }
 
 func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
@@ -135,6 +154,7 @@ func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.infoLog.Println("User id = ", id, " deleted")
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Deleted"))
 }
 

@@ -12,10 +12,21 @@ type UserTasksService interface {
 	Create(people *models.People) error
 	StartTask(user_id, task_id int) error
 	EndTask(user_id int) error
+	GetList() ([]*models.UserTask, error)
 }
 
 type UserTasksModel struct {
 	DB *gorm.DB
+}
+
+func (m *UserTasksModel) GetList() ([]*models.UserTask, error) {
+	var res []*models.UserTask
+	result := m.DB.Limit(5).Find(&res)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return res, nil
 }
 
 func (m *UserTasksModel) Create(people *models.People) error {
