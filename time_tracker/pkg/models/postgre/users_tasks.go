@@ -37,30 +37,38 @@ func (m *UserTasksModel) Create(people *models.People) error {
 
 func (m *UserTasksModel) StartTask(user_id, task_id int) error {
 	var user models.UserTask
-	result := m.DB.Find(&user, "id = ?", user_id)
+	result := m.DB.First(&user, "id = ?", user_id)
 	if result.Error != nil {
 		return result.Error
 	}
 
 	user.TaskId = task_id
-	user.StartTime = time.Now()
+	user.StartTime = time.Now().UTC()
+	user.TotalMinutes = 0
 
-	result.Save(&user)
+	result = m.DB.Save(&user)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
 
 func (m *UserTasksModel) EndTask(user_id int) error {
 	var user models.UserTask
-	result := m.DB.Find(&user, "id = ?", user_id)
+	result := m.DB.First(&user, user_id)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	user.TaskId = 1
 	user.EndTime = time.Now()
-	user.TotalMinutes = int(time.Since(user.StartTime).Minutes())
+	user.TotalMinutes = int(time.Since(user.StartTime.UTC()).Minutes())
 
-	result.Save(&user)
+	result = m.DB.Save(&user)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
 
