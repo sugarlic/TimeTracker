@@ -59,7 +59,7 @@ func (app *application) getWorkloads(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
-	user_id, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	user_id, _ := strconv.Atoi(r.URL.Query().Get("user_id"))
 	startDateStr := r.URL.Query().Get("start_date")
 	endDateStr := r.URL.Query().Get("end_date")
 

@@ -14,7 +14,7 @@ type UserTasksService interface {
 	StartTask(userId, task_id int) error
 	EndTask(userId int) error
 	GetList(filter map[string]interface{}, page, pageSize int) ([]*models.UserTask, error)
-	GetUserWorkload(userId int, startDate, endDate time.Time) ([]*models.UserTask, error)
+	GetUserWorkload(userId int, startDate, endDate time.Time) ([]*models.TaskWorkload, error)
 }
 
 type UserTasksModel struct {
