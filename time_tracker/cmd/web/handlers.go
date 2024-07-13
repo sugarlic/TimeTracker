@@ -7,18 +7,43 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"test.com/pkg/models"
 )
 
 func (app *application) getList(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
-	users, err := app.userTasks.GetList()
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	pageSize, _ := strconv.Atoi(r.URL.Query().Get("pageSize"))
+
+	if page == 0 {
+		page = 1
+	}
+	if pageSize == 0 {
+		pageSize = 10
+	}
+
+	filter := make(map[string]interface{})
+	if surname := r.URL.Query().Get("surname"); surname != "" {
+		filter["surname"] = surname
+	}
+	if name := r.URL.Query().Get("name"); name != "" {
+		filter["name"] = name
+	}
+	if patronymic := r.URL.Query().Get("patronymic"); patronymic != "" {
+		filter["patronymic"] = patronymic
+	}
+	if address := r.URL.Query().Get("address"); address != "" {
+		filter["address"] = address
+	}
+
+	users, err := app.userTasks.GetList(filter, page, pageSize)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -26,6 +51,37 @@ func (app *application) getList(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	app.render(w, users)
+}
+
+func (app *application) getWorkloads(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+	user_id, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	startDateStr := r.URL.Query().Get("start_date")
+	endDateStr := r.URL.Query().Get("end_date")
+
+	startDate, err := time.Parse("2006-01-02", startDateStr)
+	if err != nil {
+		app.badRequest(w)
+		return
+	}
+
+	endDate, err := time.Parse("2006-01-02", endDateStr)
+	if err != nil {
+		app.badRequest(w)
+		return
+	}
+
+	data, err := app.userTasks.GetUserWorkload(user_id, startDate, endDate)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	app.render(w, data)
 }
 
 func (app *application) createUser(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +92,7 @@ func (app *application) createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// запрос ко внешнему API
-	passportNumber := r.URL.Query().Get("passportNumber")
+	passportNumber := r.URL.Query().Get("PassportNumber")
 
 	parts := strings.SplitN(passportNumber, " ", 2)
 

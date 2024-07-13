@@ -39,3 +39,10 @@ type People struct {
 	Patronymic string `json:"patronymic"`
 	Address    string `json:"address"`
 }
+
+type TaskWorkload struct {
+	TaskID       int    `json:"task_id"`
+	UserID       int    `json:"user_id"`
+	TaskName     string `json:"task_name"`
+	TotalMinutes int    `json:"total_minutes"`
+}

@@ -10,18 +10,42 @@ import (
 type UserTasksService interface {
 	Delete(id int) error
 	Create(people *models.People) error
-	StartTask(user_id, task_id int) error
-	EndTask(user_id int) error
-	GetList() ([]*models.UserTask, error)
+	StartTask(userId, task_id int) error
+	EndTask(userId int) error
+	GetList(filter map[string]interface{}, page, pageSize int) ([]*models.UserTask, error)
+	GetUserWorkload(userId int, startDate, endDate time.Time) ([]*models.UserTask, error)
 }
 
 type UserTasksModel struct {
 	DB *gorm.DB
 }
 
-func (m *UserTasksModel) GetList() ([]*models.UserTask, error) {
+func (m *UserTasksModel) GetUserWorkload(userId int, startDate, endDate time.Time) ([]*models.TaskWorkload, error) {
+	var workloads []*models.TaskWorkload
+
+	result := m.DB.Table("user_tasks").
+		Select("user_tasks.task_id, tasks.name AS task_name, SUM(user_tasks.total_minutes) AS total_minutes").
+		Joins("JOIN tasks ON user_tasks.task_id = tasks.id").
+		Where("user_tasks.id = ? AND user_tasks.start_time BETWEEN ? AND ?", userId, startDate, endDate).
+		Group("user_tasks.task_id, tasks.name").
+		Order("total_minutes DESC").
+		Scan(&workloads)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return workloads, nil
+
+}
+
+func (m *UserTasksModel) GetList(filter map[string]interface{}, page, pageSize int) ([]*models.UserTask, error) {
 	var res []*models.UserTask
-	result := m.DB.Limit(5).Find(&res)
+
+	query := m.DB.Where(filter)
+	query = query.Limit(pageSize).Offset((page - 1) * pageSize)
+
+	result := query.Find(&res)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -46,9 +70,9 @@ func (m *UserTasksModel) Create(people *models.People) error {
 	return nil
 }
 
-func (m *UserTasksModel) StartTask(user_id, task_id int) error {
+func (m *UserTasksModel) StartTask(userId, task_id int) error {
 	var user models.UserTask
-	result := m.DB.First(&user, "id = ?", user_id)
+	result := m.DB.First(&user, "id = ?", userId)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -65,9 +89,9 @@ func (m *UserTasksModel) StartTask(user_id, task_id int) error {
 	return nil
 }
 
-func (m *UserTasksModel) EndTask(user_id int) error {
+func (m *UserTasksModel) EndTask(userId int) error {
 	var user models.UserTask
-	result := m.DB.First(&user, user_id)
+	result := m.DB.First(&user, userId)
 	if result.Error != nil {
 		return result.Error
 	}
