@@ -214,6 +214,26 @@ func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Deleted"))
 }
 
+func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		w.Header().Set("Allow", http.MethodDelete)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	var user models.UserTask
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		app.badRequest(w)
+		return
+	}
+
+	if err := app.userTasks.Update(&user); err != nil {
+		app.serverError(w, err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func SendRequest(client *http.Client, url string) ([]byte, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

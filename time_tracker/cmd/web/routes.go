@@ -9,6 +9,7 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("/users/tasks/start", app.startTask)
 	mux.HandleFunc("/users/tasks/end", app.endTask)
 	mux.HandleFunc("/users", app.createUser)
+	mux.HandleFunc("/users/update", app.updateUser)
 	mux.HandleFunc("/users/", app.deleteUser)
 	return mux
 }

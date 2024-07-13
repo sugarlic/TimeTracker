@@ -10,6 +10,7 @@ import (
 type UserTasksService interface {
 	Delete(id int) error
 	Create(people *models.People) error
+	Update(user *models.UserTask) error
 	StartTask(userId, task_id int) error
 	EndTask(userId int) error
 	GetList(filter map[string]interface{}, page, pageSize int) ([]*models.UserTask, error)
@@ -63,6 +64,15 @@ func (m *UserTasksModel) Create(people *models.People) error {
 	}
 
 	result := m.DB.Create(userTask)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (m *UserTasksModel) Update(user *models.UserTask) error {
+	result := m.DB.Save(&user)
 	if result.Error != nil {
 		return result.Error
 	}
