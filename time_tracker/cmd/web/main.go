@@ -17,6 +17,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq" // PostgreSQL driver
 
+	_ "test.com/docs"
 	"test.com/pkg/models/postgre"
 )
 
@@ -26,18 +27,31 @@ type application struct {
 	userTasks postgre.UserTasksService
 }
 
+// @title Time Tracker API
+// @version 1.0
+// @description This is a sample Time Tracker server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /
+
 func main() {
 	addr := flag.String("addr", ":8080", "Сетевой адрес веб-сервера")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	// Загрузка переменных окружения из .env файла
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	// Параметры подключения к базе данных PostgreSQL
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_USER"),
@@ -46,18 +60,15 @@ func main() {
 		os.Getenv("DB_PORT"),
 	)
 
-	// Подключение к базе данных `user` с использованием GORM
 	db, err := gorm.Open(gormPostgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Применение миграций
 	if err := applyMigrations(dsn); err != nil {
 		log.Fatalf("Failed to apply migrations: %v", err)
 	}
 
-	// Теперь вы можете использовать `db` для взаимодействия с базой данных
 	fmt.Println("Database connected and migrations applied successfully!")
 
 	app := &application{
@@ -77,7 +88,6 @@ func main() {
 }
 
 func applyMigrations(dsn string) error {
-	// Открываем стандартное SQL соединение для миграций
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return fmt.Errorf("failed to open database: %w", err)

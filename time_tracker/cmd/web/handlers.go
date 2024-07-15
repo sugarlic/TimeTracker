@@ -12,6 +12,19 @@ import (
 	"test.com/pkg/models"
 )
 
+// @Summary Get list of users
+// @Description Get a paginated list of users with optional filters
+// @Accept  json
+// @Produce  json
+// @Param   page     query    int     false  "Page number"
+// @Param   pageSize query    int     false  "Page size"
+// @Param   surname  query    string  false  "Surname"
+// @Param   name     query    string  false  "Name"
+// @Param   patronymic query  string  false  "Patronymic"
+// @Param   address  query    string  false  "Address"
+// @Success 200 {object} []models.UserTask
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /users/list [get]
 func (app *application) getList(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", http.MethodGet)
@@ -53,6 +66,17 @@ func (app *application) getList(w http.ResponseWriter, r *http.Request) {
 	app.render(w, users)
 }
 
+// @Summary Get user workloads
+// @Description Get workloads for a specific user within a date range
+// @Accept  json
+// @Produce  json
+// @Param   user_id    query    int     true  "User ID"
+// @Param   start_date query    string  true  "Start date (YYYY-MM-DD)"
+// @Param   end_date   query    string  true  "End date (YYYY-MM-DD)"
+// @Success 200 {object} models.TaskWorkload
+// @Failure 500 {string} string "Internal Server Error"
+// @Failure 400 {string} string "Bad Request"
+// @Router /users/workloads [get]
 func (app *application) getWorkloads(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", http.MethodGet)
@@ -84,6 +108,15 @@ func (app *application) getWorkloads(w http.ResponseWriter, r *http.Request) {
 	app.render(w, data)
 }
 
+// @Summary Create a new user
+// @Description Create a new user based on passport information
+// @Accept  json
+// @Produce  json
+// @Param   PassportNumber query string true "Passport Number"
+// @Success 201 {string} string "Success"
+// @Failure 500 {string} string "Internal Server Error"
+// @Failure 400 {string} string "Bad Request"
+// @Router /users [post]
 func (app *application) createUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
@@ -136,6 +169,16 @@ func (app *application) createUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Succes"))
 }
 
+// @Summary Start a task
+// @Description Start a specific task for a user
+// @Accept  json
+// @Produce  json
+// @Param   user_id query int true "User ID"
+// @Param   task_id query int true "Task ID"
+// @Success 200 {string} string "Started"
+// @Failure 500 {string} string "Internal Server Error"
+// @Failure 400 {string} string "Bad Request"
+// @Router /users/tasks/start [post]
 func (app *application) startTask(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
@@ -166,6 +209,15 @@ func (app *application) startTask(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Started"))
 }
 
+// @Summary End a task
+// @Description End the current task for a user
+// @Accept  json
+// @Produce  json
+// @Param   user_id query int true "User ID"
+// @Success 200 {string} string "Completed"
+// @Failure 500 {string} string "Internal Server Error"
+// @Failure 404 {string} string "Not Found"
+// @Router /users/tasks/end [post]
 func (app *application) endTask(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
@@ -190,6 +242,15 @@ func (app *application) endTask(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Completed"))
 }
 
+// @Summary Delete a user
+// @Description Delete a user by ID
+// @Accept  json
+// @Produce  json
+// @Param   id query int true "User ID"
+// @Success 200 {string} string "Deleted"
+// @Failure 500 {string} string "Internal Server Error"
+// @Failure 404 {string} string "Not Found"
+// @Router /users [delete]
 func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		w.Header().Set("Allow", http.MethodDelete)
@@ -214,9 +275,18 @@ func (app *application) deleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Deleted"))
 }
 
+// @Summary Update a user
+// @Description Update user information
+// @Accept  json
+// @Produce  json
+// @Param   user body models.UserTask true "User data"
+// @Success 200
+// @Failure 500 {string} string "Internal Server Error"
+// @Failure 400 {string} string "Bad Request"
+// @Router /users/update [put]
 func (app *application) updateUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		w.Header().Set("Allow", http.MethodDelete)
+	if r.Method != http.MethodPut {
+		w.Header().Set("Allow", http.MethodPut)
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}

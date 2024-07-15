@@ -1,0 +1,266 @@
+basePath: /
+definitions:
+  models.TaskWorkload:
+    properties:
+      task_id:
+        type: integer
+      task_name:
+        type: string
+      total_minutes:
+        type: integer
+    type: object
+  models.UserTask:
+    properties:
+      address:
+        type: string
+      endTime:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      patronymic:
+        type: string
+      startTime:
+        type: string
+      surname:
+        type: string
+      taskId:
+        type: integer
+      totalMinutes:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample Time Tracker server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Time Tracker API
+  version: "1.0"
+paths:
+  /users:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Deleted
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete a user
+    post:
+      consumes:
+      - application/json
+      description: Create a new user based on passport information
+      parameters:
+      - description: Passport Number
+        in: query
+        name: PassportNumber
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a new user
+  /users/list:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of users with optional filters
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Surname
+        in: query
+        name: surname
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Patronymic
+        in: query
+        name: patronymic
+        type: string
+      - description: Address
+        in: query
+        name: address
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UserTask'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get list of users
+  /users/tasks/end:
+    post:
+      consumes:
+      - application/json
+      description: End the current task for a user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Completed
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: End a task
+  /users/tasks/start:
+    post:
+      consumes:
+      - application/json
+      description: Start a specific task for a user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: Task ID
+        in: query
+        name: task_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Started
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Start a task
+  /users/update:
+    put:
+      consumes:
+      - application/json
+      description: Update user information
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserTask'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update a user
+  /users/workloads:
+    get:
+      consumes:
+      - application/json
+      description: Get workloads for a specific user within a date range
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TaskWorkload'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get user workloads
+swagger: "2.0"

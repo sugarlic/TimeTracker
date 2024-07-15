@@ -20,5 +20,3 @@ migrate_down:
 migrate_up:
 	migrate -database $(DATABASE_URL) -path $(MIGRATIONS_PATH) up
 
-
-#  migrate -database postgres://postgres:1@localhost:5432/postgres?sslmode=disable -path people_info/migrations force 1
