@@ -9,7 +9,7 @@ all: build_time_tr
 build_time_tr:
 	cd time_tracker && go run ./cmd/web
 
-# Цель для сборки people_info, которая зависит от migrate_down
+# Цель для сборки people_info
 build_people_info:
 	cd people_info && go run ./cmd/web
 
