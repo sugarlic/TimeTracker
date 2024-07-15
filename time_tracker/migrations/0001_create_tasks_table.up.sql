@@ -4,9 +4,3 @@ CREATE TABLE tasks (
     name VARCHAR(255) NOT NULL,
     description TEXT
 );
-
-INSERT INTO tasks (name, description)
-VALUES
-    ('Бездельник', 'Ничего не делание'),
-    ('Уборка', 'Уборка территории предприятия'),
-    ('Учеба', 'Прохождение курсов по программированию');

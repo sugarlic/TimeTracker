@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -43,8 +42,6 @@ type application struct {
 // @BasePath /
 
 func main() {
-	addr := flag.String("addr", ":8080", "Сетевой адрес веб-сервера")
-
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
@@ -58,6 +55,10 @@ func main() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 		os.Getenv("DB_PORT"),
+	)
+
+	addr := fmt.Sprintf(":%s",
+		os.Getenv("PORT"),
 	)
 
 	db, err := gorm.Open(gormPostgres.Open(dsn), &gorm.Config{})
@@ -78,7 +79,7 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:     *addr,
+		Addr:     addr,
 		ErrorLog: errorLog,
 		Handler:  app.routes(),
 	}
